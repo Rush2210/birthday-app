@@ -14,6 +14,9 @@ export default function VidhiBirthdayWebsite() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  // Refs for coordinating audio between components
+  const cakeAudioRef = useRef(null);
+  const audioControlsRef = useRef(null); // will hold controls exposed by AudioPlayer
 
   // Photo Collections for Each Chapter
   const photoCollections = {
@@ -65,7 +68,7 @@ export default function VidhiBirthdayWebsite() {
   };
 
   // --- Audio Player Component (Our Song) ---
-  const AudioPlayer = () => {
+  const AudioPlayer = ({ setAudioControls }) => {
     // Use the actual filename in `public/audio/` (underscores, no spaces)
     const audioFile = 'Ek_Din_Aap.mp3';
     const [audioError, setAudioError] = useState(false);
@@ -103,6 +106,35 @@ export default function VidhiBirthdayWebsite() {
       };
     }, []);
 
+    // Expose control functions to parent so it can stop/play this audio
+    useEffect(() => {
+      if (setAudioControls) {
+        const controls = {
+          play: async () => {
+            const a = audioRef.current;
+            if (!a) return;
+            try {
+              await a.play();
+              setIsPlaying(true);
+            } catch (e) {
+              console.error('play control failed', e);
+            }
+          },
+          stop: () => {
+            const a = audioRef.current;
+            if (!a) return;
+            a.pause();
+            a.currentTime = 0;
+            setIsPlaying(false);
+            setCurrentTime(0);
+          },
+          isPlaying: () => isPlaying,
+        };
+        setAudioControls(controls);
+        return () => setAudioControls && setAudioControls(null);
+      }
+    }, [setAudioControls, isPlaying]);
+
     const togglePlay = async () => {
       const a = audioRef.current;
       if (!a) return;
@@ -111,6 +143,17 @@ export default function VidhiBirthdayWebsite() {
           a.pause();
           setIsPlaying(false);
         } else {
+          // If cake audio is playing, stop it and collapse the cake component
+          if (cakeAudioRef && cakeAudioRef.current) {
+            try {
+              cakeAudioRef.current.pause();
+              cakeAudioRef.current.currentTime = 0;
+            } catch (e) {
+              // ignore
+            }
+            setShowBirthdayCake(false);
+          }
+
           await a.play();
           setIsPlaying(true);
         }
@@ -371,6 +414,42 @@ export default function VidhiBirthdayWebsite() {
       setRevealedMemories([...revealedMemories, id]);
     }
   };
+
+  // Toggle Make a Wish area and coordinate cake audio vs the main song
+  const handleWishToggle = async () => {
+    if (!showBirthdayCake) {
+      // Opening: stop Our Song if it's playing
+      if (audioControlsRef.current && audioControlsRef.current.isPlaying && audioControlsRef.current.isPlaying()) {
+        try {
+          audioControlsRef.current.stop();
+        } catch (e) {
+          console.error('failed to stop Our Song', e);
+        }
+      }
+      setShowBirthdayCake(true);
+      if (cakeAudioRef.current) {
+        try {
+          cakeAudioRef.current.currentTime = 0;
+          await cakeAudioRef.current.play();
+        } catch (e) {
+          console.error('cake audio play failed', e);
+        }
+      }
+    } else {
+      // Closing: stop cake audio
+      if (cakeAudioRef.current) {
+        try {
+          cakeAudioRef.current.pause();
+          cakeAudioRef.current.currentTime = 0;
+        } catch (e) {
+          // ignore
+        }
+      }
+      setShowBirthdayCake(false);
+    }
+  };
+
+  // (Removed collapseWishAndPlaySong: Play button was removed from Make a Wish panel)
 
   // Photo Gallery Component
   const PhotoGallery = ({ chapterId }) => {
@@ -787,7 +866,7 @@ export default function VidhiBirthdayWebsite() {
         {/* Birthday Cake Animation */}
         <div className="mt-12 text-center">
           <button
-            onClick={() => setShowBirthdayCake(!showBirthdayCake)}
+            onClick={handleWishToggle}
             className="bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 text-white px-10 py-5 rounded-full font-bold shadow-2xl hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-lg"
           >
             🎂 Make a Wish! 🎂
@@ -805,8 +884,11 @@ export default function VidhiBirthdayWebsite() {
                 <span className="text-4xl animate-bounce" style={{ animationDelay: '0.2s' }}>🕯️</span>
                 <span className="text-4xl animate-bounce" style={{ animationDelay: '0.4s' }}>🕯️</span>
               </div>
+              {/* Play Our Song button removed per user request */}
             </div>
           )}
+          {/* Hidden cake audio element (controlled by Make a Wish) */}
+          <audio ref={cakeAudioRef} src={encodeURI('/audio/happy-birthday-song.mp3')} preload="auto" />
         </div>
 
         {/* Birthday Message Section */}
@@ -897,7 +979,7 @@ export default function VidhiBirthdayWebsite() {
             </p>
 
             {/* Audio Player Controls */}
-            <AudioPlayer />
+            <AudioPlayer setAudioControls={(c) => (audioControlsRef.current = c)} />
         </div>
 
         {/* Footer */}
