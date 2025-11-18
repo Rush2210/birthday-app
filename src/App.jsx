@@ -439,17 +439,57 @@ export default function VidhiBirthdayWebsite() {
 
   // Lightbox Modal
   const Lightbox = () => {
+    // Touch gesture refs (must be called unconditionally)
+    const touchStartX = useRef(null);
+    const touchEndX = useRef(null);
+
     if (!lightboxOpen || !lightboxImage) return null;
 
     const photos = photoCollections[lightboxImage.chapterId];
     const currentPhoto = photos[lightboxImage.photoIndex];
 
+    const handleTouchStart = (e) => {
+      if (e.touches && e.touches.length === 1) {
+        touchStartX.current = e.touches[0].clientX;
+        touchEndX.current = null;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (e.touches && e.touches.length === 1) {
+        touchEndX.current = e.touches[0].clientX;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (touchStartX.current == null || touchEndX.current == null) return;
+      const deltaX = touchEndX.current - touchStartX.current;
+      const SWIPE_THRESHOLD = 50; // px
+      if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+        if (deltaX < 0) {
+          nextPhoto(); // swipe left -> next
+        } else {
+          prevPhoto(); // swipe right -> prev
+        }
+      }
+      touchStartX.current = null;
+      touchEndX.current = null;
+    };
+
     return (
-      <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4">
+      <div
+        className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        role="dialog"
+        aria-label="Photo viewer"
+      >
         {/* Close Button */}
         <button
           onClick={closeLightbox}
           className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all"
+          aria-label="Close photo viewer"
         >
           <X size={24} />
         </button>
@@ -457,8 +497,8 @@ export default function VidhiBirthdayWebsite() {
         {/* Image */}
         <img
           src={`/photos/${currentPhoto}`}
-          alt="Full size"
-          className="max-w-full max-h-[90vh] object-contain rounded-lg"
+          alt={`Memory ${lightboxImage.photoIndex + 1}`}
+          className="max-w-full max-h-[90vh] object-contain rounded-lg touch-action-pan-y"
         />
 
         {/* Counter and Switcher */}
