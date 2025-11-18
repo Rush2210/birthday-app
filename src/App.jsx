@@ -17,6 +17,7 @@ export default function VidhiBirthdayWebsite() {
   // Refs for coordinating audio between components
   const cakeAudioRef = useRef(null);
   const audioControlsRef = useRef(null); // will hold controls exposed by AudioPlayer
+  const [isCakePlaying, setIsCakePlaying] = useState(false);
 
   // Photo Collections for Each Chapter
   const photoCollections = {
@@ -114,6 +115,12 @@ export default function VidhiBirthdayWebsite() {
             const a = audioRef.current;
             if (!a) return;
             try {
+              // If cake audio is playing, stop it first
+              if (cakeAudioRef && cakeAudioRef.current && !cakeAudioRef.current.paused) {
+                try { cakeAudioRef.current.pause(); cakeAudioRef.current.currentTime = 0; } catch(e) {}
+                setShowBirthdayCake(false);
+                setIsCakePlaying(false);
+              }
               await a.play();
               setIsPlaying(true);
             } catch (e) {
@@ -144,7 +151,7 @@ export default function VidhiBirthdayWebsite() {
           setIsPlaying(false);
         } else {
           // If cake audio is playing, stop it and collapse the cake component
-          if (cakeAudioRef && cakeAudioRef.current) {
+          if (cakeAudioRef && cakeAudioRef.current && !cakeAudioRef.current.paused) {
             try {
               cakeAudioRef.current.pause();
               cakeAudioRef.current.currentTime = 0;
@@ -152,6 +159,7 @@ export default function VidhiBirthdayWebsite() {
               // ignore
             }
             setShowBirthdayCake(false);
+            setIsCakePlaying(false);
           }
 
           await a.play();
@@ -431,6 +439,7 @@ export default function VidhiBirthdayWebsite() {
         try {
           cakeAudioRef.current.currentTime = 0;
           await cakeAudioRef.current.play();
+          setIsCakePlaying(true);
         } catch (e) {
           console.error('cake audio play failed', e);
         }
@@ -441,6 +450,7 @@ export default function VidhiBirthdayWebsite() {
         try {
           cakeAudioRef.current.pause();
           cakeAudioRef.current.currentTime = 0;
+          setIsCakePlaying(false);
         } catch (e) {
           // ignore
         }
