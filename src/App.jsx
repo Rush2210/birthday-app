@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Sparkles, Cake, Gift, Music, Dog, Calendar, Flower2, GraduationCap, PartyPopper, X, ChevronLeft, ChevronRight, Camera, Play, Pause } from 'lucide-react';
 
 export default function VidhiBirthdayWebsite() {
+    // Track which chapters have revealed photos
+    const [revealedPhotoChapters, setRevealedPhotoChapters] = useState([]);
+    const [openedViaRevealChapter, setOpenedViaRevealChapter] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [showConfetti, setShowConfetti] = useState(true);
   const [revealedMemories, setRevealedMemories] = useState([]);
@@ -291,6 +294,7 @@ export default function VidhiBirthdayWebsite() {
 
   // Lightbox Functions
   const openLightbox = (chapterId, photoIndex) => {
+    setOpenedViaRevealChapter(null);
     setLightboxImage({ chapterId, photoIndex });
     setLightboxOpen(true);
   };
@@ -298,6 +302,19 @@ export default function VidhiBirthdayWebsite() {
   const closeLightbox = () => {
     setLightboxOpen(false);
     setLightboxImage(null);
+    // If the lightbox was opened via the Reveal button, restore hidden state
+    if (openedViaRevealChapter !== null) {
+      setRevealedPhotoChapters((prev) => prev.filter((id) => id !== openedViaRevealChapter));
+      setOpenedViaRevealChapter(null);
+    }
+
+  };
+
+  const revealPhotos = (chapterId) => {
+    setRevealedPhotoChapters((prev) => prev.includes(chapterId) ? prev : [...prev, chapterId]);
+    setLightboxImage({ chapterId, photoIndex: 0 });
+    setLightboxOpen(true);
+    setOpenedViaRevealChapter(chapterId);
   };
 
   const nextPhoto = () => {
@@ -357,9 +374,8 @@ export default function VidhiBirthdayWebsite() {
   const PhotoGallery = ({ chapterId }) => {
     const photos = photoCollections[chapterId] || [];
     const [activeIndex, setActiveIndex] = useState(0);
-
+    const isRevealed = revealedPhotoChapters.includes(chapterId);
     if (photos.length === 0) return null;
-
     return (
       <div className="mb-6">
         <div className="flex items-center justify-center gap-2 mb-4">
@@ -367,40 +383,54 @@ export default function VidhiBirthdayWebsite() {
           <h4 className="text-lg font-bold text-gray-800">Our Memories 📸</h4>
           <Camera className="text-pink-500" size={20} />
         </div>
-        
-        {/* Main Photo Display */}
-        <div className="relative bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-2 mb-3">
-          <img
-            src={`/photos/${photos[activeIndex]}`}
-            alt={`Memory ${activeIndex + 1}`}
-            className="w-full h-64 object-cover rounded-xl cursor-pointer shadow-lg"
-            onClick={() => openLightbox(chapterId, activeIndex)}
-          />
-          <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-            {activeIndex + 1} / {photos.length}
+        {!isRevealed ? (
+          <div className="relative bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-8 mb-3 text-center">
+            <div className="h-64 flex flex-col items-center justify-center bg-white/60 rounded-xl p-6">
+              <p className="text-2xl font-semibold text-pink-600 mb-2">Hidden Memories</p>
+              <p className="text-sm text-gray-600 mb-4">These photos are hidden so your birthday is a surprise. Click to reveal!</p>
+              <button
+                onClick={() => revealPhotos(chapterId)}
+                className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Reveal Memories
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Thumbnail Navigation */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {photos.map((photo, idx) => (
-            <img
-              key={idx}
-              src={`/photos/${photo}`}
-              alt={`Thumbnail ${idx + 1}`}
-              className={`w-16 h-16 object-cover rounded-lg cursor-pointer flex-shrink-0 transition-all duration-300 ${
-                idx === activeIndex
-                  ? 'ring-4 ring-pink-500 scale-110'
-                  : 'opacity-60 hover:opacity-100'
-              }`}
-              onClick={() => setActiveIndex(idx)}
-            />
-          ))}
-        </div>
-
-        <p className="text-center text-sm text-gray-500 mt-3 italic">
-          Tap on photo to view full screen ✨
-        </p>
+        ) : (
+          <>
+            {/* Main Photo Display */}
+            <div className="relative bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-2 mb-3">
+              <img
+                src={`/photos/${photos[activeIndex]}`}
+                alt={`Memory ${activeIndex + 1}`}
+                className="w-full h-64 object-cover rounded-xl cursor-pointer shadow-lg"
+                onClick={() => openLightbox(chapterId, activeIndex)}
+              />
+              <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                {activeIndex + 1} / {photos.length}
+              </div>
+            </div>
+            {/* Thumbnail Navigation */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {photos.map((photo, idx) => (
+                <img
+                  key={idx}
+                  src={`/photos/${photo}`}
+                  alt={`Thumbnail ${idx + 1}`}
+                  className={`w-16 h-16 object-cover rounded-lg cursor-pointer flex-shrink-0 transition-all duration-300 ${
+                    idx === activeIndex
+                      ? 'ring-4 ring-pink-500 scale-110'
+                      : 'opacity-60 hover:opacity-100'
+                  }`}
+                  onClick={() => setActiveIndex(idx)}
+                />
+              ))}
+            </div>
+            <p className="text-center text-sm text-gray-500 mt-3 italic">
+              Tap on photo to view full screen ✨
+            </p>
+          </>
+        )}
       </div>
     );
   };

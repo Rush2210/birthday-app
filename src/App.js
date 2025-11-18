@@ -191,12 +191,8 @@ export default function VidhiBirthdayWebsite() {
   const closeLightbox = () => {
     setLightboxOpen(false);
     setLightboxImage(null);
-
-    // If the lightbox was opened via the Reveal button, restore hidden state
-    if (openedViaRevealChapter !== null) {
-      setRevealedPhotoChapters((prev) => prev.filter((id) => id !== openedViaRevealChapter));
-      setOpenedViaRevealChapter(null);
-    }
+    // Do not hide the gallery after closing; keep it revealed
+    setOpenedViaRevealChapter(null);
   };
 
   const nextPhoto = () => {
@@ -278,12 +274,12 @@ export default function VidhiBirthdayWebsite() {
   };
 
   const revealPhotos = (chapterId) => {
+    // Mark this chapter as revealed so the inline gallery is shown after closing
+    setRevealedPhotoChapters((prev) => prev.includes(chapterId) ? prev : [...prev, chapterId]);
     // Open the full-page viewer (lightbox) at the first photo of the chapter
     setLightboxImage({ chapterId, photoIndex: 0 });
     setLightboxOpen(true);
-
-    // Record that this viewer was opened via the Reveal button so we can
-    // restore the hidden view when it closes
+    // Record that this viewer was opened via the Reveal button (for future logic if needed)
     setOpenedViaRevealChapter(chapterId);
   };
 
