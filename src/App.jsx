@@ -80,8 +80,10 @@ export default function VidhiBirthdayWebsite() {
 
       const onLoaded = () => setDuration(a.duration || 0);
       const onTime = () => setCurrentTime(a.currentTime || 0);
-      const onEnded = () => setIsPlaying(false);
-
+      const onEnded = () => {
+        setIsPlaying(false);
+        setCurrentTime(0); // Reset seeker to 0:00
+      };
 
       const onError = (e) => {
         setAudioError(true);
