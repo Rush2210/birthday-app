@@ -454,22 +454,6 @@ export default function VidhiBirthdayWebsite() {
           <X size={24} />
         </button>
 
-        {/* Previous Button */}
-        <button
-          onClick={prevPhoto}
-          className="absolute left-4 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all"
-        >
-          <ChevronLeft size={32} />
-        </button>
-
-        {/* Next Button */}
-        <button
-          onClick={nextPhoto}
-          className="absolute right-4 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all"
-        >
-          <ChevronRight size={32} />
-        </button>
-
         {/* Image */}
         <img
           src={`/photos/${currentPhoto}`}
@@ -477,9 +461,23 @@ export default function VidhiBirthdayWebsite() {
           className="max-w-full max-h-[90vh] object-contain rounded-lg"
         />
 
-        {/* Counter */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/20 text-white px-4 py-2 rounded-full">
-          {lightboxImage.photoIndex + 1} / {photos.length}
+        {/* Counter and Switcher */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/20 text-white px-4 py-2 rounded-full">
+          <button
+            onClick={prevPhoto}
+            className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all"
+            aria-label="Previous photo"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <span className="mx-2 text-lg font-semibold">{lightboxImage.photoIndex + 1} / {photos.length}</span>
+          <button
+            onClick={nextPhoto}
+            className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all"
+            aria-label="Next photo"
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
       </div>
     );
