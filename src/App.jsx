@@ -211,7 +211,7 @@ export default function VidhiBirthdayWebsite() {
       <div className="mt-6 flex flex-col items-center w-full max-w-xl mx-auto">
         <audio
           ref={audioRef}
-          src={encodeURI(`/audio/${audioFile}`)}
+          src={encodeURI(`./audio/${audioFile}`)}
           preload="metadata"
           style={{ display: 'none' }}
         />
@@ -525,7 +525,7 @@ export default function VidhiBirthdayWebsite() {
             {/* Main Photo Display */}
             <div className="relative bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl p-2 mb-3">
               <img
-                src={`/photos/${photos[activeIndex]}`}
+                src={`./photos/${photos[activeIndex]}`}
                 alt={`Memory ${activeIndex + 1}`}
                 className="w-full h-64 object-cover rounded-xl cursor-pointer shadow-lg"
                 onClick={() => openLightbox(chapterId, activeIndex)}
@@ -539,7 +539,7 @@ export default function VidhiBirthdayWebsite() {
               {photos.map((photo, idx) => (
                 <img
                   key={idx}
-                  src={`/photos/${photo}`}
+                  src={`./photos/${photo}`}
                   alt={`Thumbnail ${idx + 1}`}
                   className={`w-16 h-16 object-cover rounded-lg cursor-pointer flex-shrink-0 transition-all duration-300 ${
                     idx === activeIndex
@@ -648,7 +648,7 @@ export default function VidhiBirthdayWebsite() {
           <div className="flex flex-col items-center w-full">
             <video
               ref={videoRef}
-              src={`/photos/${currentPhoto}`}
+              src={`./photos/${currentPhoto}`}
               className="max-w-full max-h-[78vh] object-contain rounded-lg touch-action-pan-y bg-black"
               onTimeUpdate={(e) => {
                 const t = e.target.currentTime || 0;
@@ -716,7 +716,7 @@ export default function VidhiBirthdayWebsite() {
           </div>
         ) : (
           <img
-            src={`/photos/${currentPhoto}`}
+            src={`./photos/${currentPhoto}`}
             alt={`Memory ${lightboxImage.photoIndex + 1}`}
             className="max-w-full max-h-[90vh] object-contain rounded-lg touch-action-pan-y"
           />
@@ -1036,7 +1036,7 @@ export default function VidhiBirthdayWebsite() {
             </div>
           )}
           {/* Hidden cake audio element (controlled by Make a Wish) */}
-          <audio ref={cakeAudioRef} src={encodeURI('/audio/happy-birthday-song.mp3')} preload="auto" />
+          <audio ref={cakeAudioRef} src={encodeURI('./audio/happy-birthday-song.mp3')} preload="auto" />
         </div>
 
         {/* Birthday Message Section */}
