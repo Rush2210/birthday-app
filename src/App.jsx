@@ -87,6 +87,14 @@ export default function VidhiBirthdayWebsite() {
     ]
   };
 
+  // Utility: format seconds -> M:SS (used by audio and video controls)
+  const formatTime = (t) => {
+    if (!t || isNaN(t)) return '0:00';
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   // --- Audio Player Component (Our Song) ---
   const AudioPlayer = ({ setAudioControls }) => {
     // Use the actual filename in `public/audio/` (underscores, no spaces)
@@ -197,12 +205,7 @@ export default function VidhiBirthdayWebsite() {
       setCurrentTime(parseFloat(e.target.value));
     };
 
-    const formatTime = (t) => {
-      if (!t || isNaN(t)) return '0:00';
-      const m = Math.floor(t / 60);
-      const s = Math.floor(t % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
-    };
+    
 
     return (
       <div className="mt-6 flex flex-col items-center w-full max-w-xl mx-auto">
@@ -550,11 +553,38 @@ export default function VidhiBirthdayWebsite() {
     // Touch gesture refs (must be called unconditionally)
     const touchStartX = useRef(null);
     const touchEndX = useRef(null);
+    const videoRef = useRef(null);
+    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+    const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+    const [videoDuration, setVideoDuration] = useState(0);
+
+    // Video handlers and effects (must be called unconditionally)
+    useEffect(() => {
+      // When changing the shown media, reset video state
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause();
+          videoRef.current.currentTime = 0;
+        } catch (e) {}
+      }
+      setIsVideoPlaying(false);
+      setVideoCurrentTime(0);
+      setVideoDuration(0);
+    }, [lightboxImage]);
+
+    useEffect(() => {
+      // cleanup when lightbox unmounts
+      return () => {
+        if (videoRef.current) {
+          try { videoRef.current.pause(); videoRef.current.currentTime = 0; } catch (e) {}
+        }
+      };
+    }, []);
 
     if (!lightboxOpen || !lightboxImage) return null;
-
     const photos = photoCollections[lightboxImage.chapterId];
     const currentPhoto = photos[lightboxImage.photoIndex];
+    const isVideo = /\.(mp4|webm|ogg|mov|m4v)$/i.test(currentPhoto || '');
 
     const handleTouchStart = (e) => {
       if (e.touches && e.touches.length === 1) {
@@ -602,12 +632,76 @@ export default function VidhiBirthdayWebsite() {
           <X size={24} />
         </button>
 
-        {/* Image */}
-        <img
-          src={`/photos/${currentPhoto}`}
-          alt={`Memory ${lightboxImage.photoIndex + 1}`}
-          className="max-w-full max-h-[90vh] object-contain rounded-lg touch-action-pan-y"
-        />
+        {/* Image or Video */}
+        {isVideo ? (
+          <div className="flex flex-col items-center w-full">
+            <video
+              ref={videoRef}
+              src={`/photos/${currentPhoto}`}
+              className="max-w-full max-h-[78vh] object-contain rounded-lg touch-action-pan-y bg-black"
+              onTimeUpdate={(e) => {
+                const t = e.target.currentTime || 0;
+                setVideoCurrentTime(t);
+              }}
+              onLoadedMetadata={(e) => setVideoDuration(e.target.duration || 0)}
+              onEnded={() => setIsVideoPlaying(false)}
+            />
+
+            {/* Controls */}
+            <div className="mt-4 w-full max-w-4xl px-4 flex items-center gap-4">
+              <button
+                onClick={async () => {
+                  const v = videoRef.current;
+                  if (!v) return;
+                  try {
+                    if (isVideoPlaying) {
+                      v.pause();
+                      setIsVideoPlaying(false);
+                    } else {
+                      await v.play();
+                      setIsVideoPlaying(true);
+                    }
+                  } catch (e) {
+                    console.error('video play/pause failed', e);
+                  }
+                }}
+                aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+                className="bg-white/10 text-white p-3 rounded-full"
+              >
+                {isVideoPlaying ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+
+              <div className="flex-1 flex items-center gap-3">
+                <span className="text-sm text-white w-12 text-right">{formatTime(videoCurrentTime)}</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={videoDuration || 0}
+                  value={videoCurrentTime}
+                  onChange={(e) => {
+                    const v = videoRef.current;
+                    const t = parseFloat(e.target.value);
+                    if (v) v.currentTime = t;
+                    setVideoCurrentTime(t);
+                  }}
+                  step="0.01"
+                  className="w-full h-2 rounded-lg"
+                  aria-label="Video seek"
+                  style={{
+                    background: `linear-gradient(90deg, #fb7185 ${videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%, #374151 ${videoDuration ? (videoCurrentTime / videoDuration) * 100 : 0}%)`
+                  }}
+                />
+                <span className="text-sm text-white w-12 text-left">{formatTime(videoDuration)}</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <img
+            src={`/photos/${currentPhoto}`}
+            alt={`Memory ${lightboxImage.photoIndex + 1}`}
+            className="max-w-full max-h-[90vh] object-contain rounded-lg touch-action-pan-y"
+          />
+        )}
 
         {/* Counter and Switcher */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 bg-white/20 text-white px-4 py-2 rounded-full">
