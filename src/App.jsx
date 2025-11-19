@@ -423,6 +423,17 @@ export default function VidhiBirthdayWebsite() {
     return () => clearTimeout(confettiTimer);
   }, []);
 
+  // Prevent background scrolling when lightbox is open
+  useEffect(() => {
+    const prev = document.body.style.overflow || '';
+    if (lightboxOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = prev;
+    }
+    return () => { document.body.style.overflow = prev; };
+  }, [lightboxOpen]);
+
   const nextChapter = () => {
     if (currentChapter < story.chapters.length - 1) {
       setCurrentChapter(currentChapter + 1);
@@ -644,7 +655,15 @@ export default function VidhiBirthdayWebsite() {
                 setVideoCurrentTime(t);
               }}
               onLoadedMetadata={(e) => setVideoDuration(e.target.duration || 0)}
-              onEnded={() => setIsVideoPlaying(false)}
+              onEnded={(e) => {
+                try {
+                  // reset native video element to 0
+                  e.target.pause();
+                  e.target.currentTime = 0;
+                } catch (err) {}
+                setIsVideoPlaying(false);
+                setVideoCurrentTime(0);
+              }}
             />
 
             {/* Controls */}
