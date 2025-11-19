@@ -747,24 +747,29 @@ export default function VidhiBirthdayWebsite() {
   const Confetti = () => (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
       {showConfetti && [...Array(50)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute animate-confetti"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: '-10%',
-            animationDelay: `${Math.random() * 3}s`,
-            animationDuration: `${3 + Math.random() * 2}s`,
-          }}
-        >
           <div
-            className="w-3 h-3 rounded-full"
+            key={i}
+            className="absolute animate-confetti text-center"
             style={{
-              backgroundColor: ['#FF69B4', '#FFB6C1', '#FFC0CB', '#FF1493', '#FFD700'][Math.floor(Math.random() * 5)]
+              left: `${Math.random() * 100}%`,
+              top: '-10%',
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`,
             }}
-          />
-        </div>
-      ))}
+          >
+            <div
+              className="inline-block"
+              style={{
+                color: ['#FF69B4', '#FFB6C1', '#FFC0CB', '#FF1493', '#FFD700'][Math.floor(Math.random() * 5)],
+                fontSize: '18px',
+                lineHeight: 1,
+                transform: `rotate(${Math.floor(Math.random() * 40) - 20}deg)`
+              }}
+            >
+              ❤
+            </div>
+          </div>
+        ))}
     </div>
   );
 
