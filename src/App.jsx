@@ -22,49 +22,68 @@ export default function VidhiBirthdayWebsite() {
   // Photo Collections for Each Chapter
   const photoCollections = {
     0: [ // Tobby's Magic
-      'PHOTO-2025-06-06-10-42-39.jpg',
-      '424dc68a-4408-4a2c-9a70-97798ddddb7e 2.JPG',
-      'eddbed64-0ef9-4cb6-a909-464023e3299e.jpg'
+      'Image_8.jpg',
+      'Image_28.jpg'
     ],
     1: [ // First Adventures
-      'PHOTO-2025-03-15-14-27-31 2.jpg',
-      'PHOTO-2025-03-15-14-27-32.jpg',
-      'AAC753F9-60EB-4F33-AB12-2F51CAEB071E.JPG'
+      'Image_5.jpg',
+      'Image_6.jpg',
+      'Image_14.jpg',
+      'Image_20.jpg',
+      'Image_67.jpg',
+      'Image_65.jpg',
+      'Image_74.jpg',
+      'Image_73.jpg'
     ],
     2: [ // Stadium Proposal - placeholder until you add photos
-      'IMG_2328.JPG',
-      'IMG_2348.JPG',
-      'cbe1afe1-69b1-4b99-9e5c-ad2379b4f5ac.JPG'
+      'Image_43.jpg',
+      'Image_35.jpg',
+      'Image_37.jpg',
+      'Image_38.jpg'
     ],
     3: [ // Falling in Love
-      'PHOTO-2025-03-28-11-47-49.jpg',
-      'PHOTO-2025-03-30-00-10-15.jpg',
-      'PHOTO-2025-03-30-00-12-48.jpg',
-      'PHOTO-2025-04-26-03-42-22.jpg'
+      'Image_4.jpg',
+      'Image_12.jpg',
+      'Image_13.jpg',
+      'Image_15.jpg',
+      'Image_16.jpg',
+      'Image_23.jpg',
+      'Image_26.jpg',
+      'Image_27.jpg',
+      'Image_62.jpg'
     ],
     4: [ // The Ring
-      'IMG_3477.JPG',
-      '0365ac52-5016-442f-8d7f-812e33d3e142.jpg',
-      'IMG_2317.JPG'
+      'Vid_1.MP4',
+      'Image_21.jpg',
+      'Image_22.jpg',
+      'Image_30.jpg',
+      'Image_36.jpg',
+      'Image_33.jpg',
+      'Image_39.jpg'
     ],
     5: [ // Dr. Vidhi Dave
-      'Screenshot_2023-10-13-14-45-36-96_1c337646f29875672b5a61192b9010f9.JPG',
-      'e10014a2-eb6e-49ca-aea4-6a4d3faff601.JPG'
+      'Image_2.jpg',
+      'Image_41.jpg'
     ],
     6: [ // Navratri
-      'IMG_2328.JPG',
-      'IMG_3051.JPG',
-      'IMG_9439.JPG',
-      'cbe1afe1-69b1-4b99-9e5c-ad2379b4f5ac.JPG'
+      'Image_9.jpg',
+      'Image_10.jpg',
+      'Image_11.jpg',
+      'Image_42.jpg',
+      'Image_44.jpg',
+      'Image_66.jpg'
     ],
     7: [ // Birthday
-      'PHOTO-2025-09-14-10-06-23.jpg',
-      'PHOTO-2025-09-14-10-06-26.jpg',
-      'PHOTO-2025-09-14-10-06-27 2.jpg',
-      'PHOTO-2025-09-14-10-06-29 3.jpg',
-      'IMG_8613.JPG',
-      'IMG_8631.JPG',
-      'IMG_8678.JPG'
+      'Image_1.jpg',
+      'Image_7.jpg',
+      'Image_17.jpg',
+      'Image_18.jpg',
+      'Image_19.jpg',
+      'Image_24.jpg',
+      'Image_25.jpg',
+      'Image_29.jpg',
+      'Image_31.jpg',
+      'Image_61.jpg'
     ]
   };
 
