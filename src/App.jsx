@@ -930,7 +930,8 @@ export default function VidhiBirthdayWebsite() {
                 className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-flex items-center animate-pulse-glow"
               >
                 <Heart className="mr-2" fill="currentColor" size={20} />
-                Send Love & Confetti 💖
+                Send Love &nbsp;
+                <Heart className="mr-2" fill="currentColor" size={20} />
               </button>
             </div>
 
